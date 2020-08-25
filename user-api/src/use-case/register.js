@@ -15,6 +15,15 @@ const makeRegister = ({ userDb }) => async (userInfo) => {
         return exists
     }
 
-
+    return userDb.insert({
+        id: user.getId(),
+        username: user.getUsername(),
+        email: user.getEmail(),
+        modifiedOn: user.getModifiedOn(),
+        createdOn: user.getCreatedOn(),
+        password: user.getPassword(),
+    })
 
 }
+
+module.exports = makeRegister

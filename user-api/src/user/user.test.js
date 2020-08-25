@@ -13,7 +13,6 @@ test('Successfully creates an User entity', () => {
     expect(user.getId()).toBe(userObj.id)
     expect(user.getUsername()).toBe(userObj.username)
     expect(user.getEmail()).toBe(userObj.email)
-    expect(user.getPassword()).toBe(userObj.password)
 })
 
 

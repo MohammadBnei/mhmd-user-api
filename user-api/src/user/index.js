@@ -10,10 +10,7 @@ const hashPassword = (password) => {
 
 const makeUser = require('./user')({
     userSchema,
-    crypt: {
-        hashPassword,
-        compare: bcrypt.compare
-    }
+    hashPassword
 })
 
 module.exports = makeUser
