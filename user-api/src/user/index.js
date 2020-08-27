@@ -1,5 +1,7 @@
 const userSchema = require('./validation')
 const bcrypt = require('bcrypt')
+const shortid = require('shortid')
+
 
 const hashPassword = (password) => {
     const salt = bcrypt.genSaltSync()
@@ -10,7 +12,8 @@ const hashPassword = (password) => {
 
 const makeUser = require('./user')({
     userSchema,
-    hashPassword
+    hashPassword,
+    idGenerator: shortid
 })
 
 module.exports = makeUser

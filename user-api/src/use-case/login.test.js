@@ -1,10 +1,9 @@
 const makeUser = require('../user')
 
 const userDb = {
-    findByEmailOrUsername: (email, username) => {
+    findByEmailOrUsername: async (email, username) => {
         if (email === userObj.email) {
-            makeUser(userObj)
-            return { ...userObj, password: makeUser(userObj).getPassword() }
+            return { ...userObj, password: (await makeUser(userObj)).getPassword() }
         }
 
         const user2 = {
@@ -13,8 +12,7 @@ const userDb = {
         }
 
         if (username === user2.username) {
-            makeUser(user2)
-            return { ...user2, password: makeUser(user2).getPassword() }
+            return { ...user2, password: (await makeUser(user2)).getPassword() }
         }
 
         return null

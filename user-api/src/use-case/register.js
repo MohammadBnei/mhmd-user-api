@@ -8,7 +8,7 @@ const makeRegister = ({ userDb }) => async (userInfo) => {
         insert: Joi.function()
             .required()
     }))
-    const user = makeUser(userInfo)
+    const user = await makeUser(userInfo)
 
     const exists = await userDb.findByEmailOrUsername(user.getEmail(), user.getUsername())
     if (exists) {
