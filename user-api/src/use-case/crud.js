@@ -7,13 +7,13 @@ const makeCrudUser = ({ userDb }) => {
     assert(userDb, Joi.object({
         findByEmailOrUsername: Joi.function()
             .required(),
-        insert: Joi.function()
-            .required(),
-        update: Joi.function()
-            .required(),
         findAll: Joi.function()
             .required(),
         findById: Joi.function()
+            .required(),
+        insert: Joi.function()
+            .required(),
+        update: Joi.function()
             .required(),
         remove: Joi.function()
             .required(),
@@ -67,9 +67,8 @@ const makeCrudUser = ({ userDb }) => {
             throw new RangeError('User not found')
         }
 
-        const user = await makeUser({ ...existing, ...changes, modifiedOn: null })
-        const updated = await userDb.update({
-            id: user.getId(),
+        const user = makeUser({ ...existing, ...changes, modifiedOn: null })
+        const updated = await userDb.update(user.getId(), {
             modifiedOn: user.getModifiedOn(),
             username: user.getUsername(),
             email: user.getEmail(),

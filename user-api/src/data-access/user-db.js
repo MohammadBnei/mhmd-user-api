@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const { Op } = require('sequelize')
 
 /**
  * 
@@ -7,25 +8,56 @@ const Joi = require('joi')
 const makeUserdb = async ({ makeDb }) => {
     Joi.assert(makeDb, Joi.function().required())
 
-    const db = await makeDb()
+    const { User } = await makeDb()
 
-    async function findAll() {
-        return await db.findAll()
+    function findAllUsers() {
+        return User.findAll()
     }
 
-    async function findById(id) {
-        return await db.findByPk(id)
+    function findById(id) {
+        return User.findByPk(id)
     }
 
-    async function insert(user) {
-        return await db.create(user)
+    function findByEmailOrUsername({ email = '', username = '' }) {
+        const query = {
+            where: {
+                [Op.or]: [
+                    { email },
+                    { username }
+                ]
+            }
+        }
+        return User.findOne(query)
     }
+
+    function insert(user) {
+        return User.create(user)
+    }
+
+    function update(id, changes) {
+        const query = {
+            where: {
+                id
+            }
+        }
+        return User.update(changes, query)
+    }
+    function remove(id) {
+        const query = {
+            where: {
+                id
+            }
+        }
+        return User.destroy(query)
+    }
+
 
     return Object.freeze({
+        findById,
+        findAllUsers,
         findByEmailOrUsername,
         insert,
-        findById,
-        findAll,
+        update,
         remove,
     })
 }

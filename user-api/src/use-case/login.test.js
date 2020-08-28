@@ -1,48 +1,45 @@
-const makeUser = require('../user')
+const createMockDb = require('./__fixtures')
 
-const userDb = {
-    findByEmailOrUsername: async (email, username) => {
-        if (email === userObj.email) {
-            return { ...userObj, password: (await makeUser(userObj)).getPassword() }
-        }
+let testLogin, users
 
-        const user2 = {
-            ...userObj,
-            password: 'test2',
-        }
+beforeAll(async (done) => {
+    const [userDb, usersList] = await createMockDb()
+    users = usersList
+    testLogin = require('./login')({ userDb })
 
-        if (username === user2.username) {
-            return { ...user2, password: (await makeUser(user2)).getPassword() }
-        }
+    done()
+})
+test('Should find the user by email, compare password and return the user', (done) => {
+    const initialUser = users[1]
 
-        return null
-    }
-}
-
-const userObj = {
-    id: '1234',
-    username: 'test',
-    email: 'mohammad@test.com',
-    password: 'test'
-}
-
-const testLogin = require('./login')({ userDb })
-
-test('Should find the user, compare password and return the user', (done) => {
     testLogin({
-        email: userObj.email,
-        password: userObj.password
+        email: initialUser.email,
+        password: initialUser.clearPassword
     })
         .then(user => {
-            expect(user.username).toBe(userObj.username)
-            expect(user.email).toBe(userObj.email)
+            expect(user.username).toBe(initialUser.username)
+            expect(user.email).toBe(initialUser.email)
             done()
         })
 })
 
-test('Should find the user, fail at comparing passwords', (done) => {
+test('Should find the user by email, compare password and return the user', (done) => {
+    const initialUser = users[1]
     testLogin({
-        username: userObj.username,
+        username: initialUser.username,
+        password: initialUser.clearPassword
+    })
+        .then(user => {
+            expect(user.username).toBe(initialUser.username)
+            expect(user.email).toBe(initialUser.email)
+            done()
+        })
+})
+
+test('Should find the user by username, fail at comparing passwords', (done) => {
+    const initialUser = users[2]
+    testLogin({
+        username: initialUser.username,
         password: 'fail'
     })
         .then(user => {

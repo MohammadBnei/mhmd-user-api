@@ -8,10 +8,7 @@ const makeTestLogin = ({ userDb }) => async ({
     email,
     password
 }) => {
-    assert(userDb, Joi.object({
-        findByEmailOrUsername: Joi.function()
-            .required()
-    }))
+    assert(userDb.findByEmailOrUsername, Joi.function().required())
 
     assert(password, Joi.string().required())
     assert({ username, email }, Joi.object({
@@ -19,7 +16,7 @@ const makeTestLogin = ({ userDb }) => async ({
         email: Joi.string().email()
     }))
 
-    const user = await userDb.findByEmailOrUsername(email, username)
+    const user = await userDb.findByEmailOrUsername({ email, username })
     if (!user) {
         throw new Error('User not found')
     }

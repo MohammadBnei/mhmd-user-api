@@ -2,15 +2,12 @@ const makeUser = require('../user')
 const Joi = require('joi')
 
 const makeRegister = ({ userDb }) => async (userInfo) => {
-    Joi.assert(userDb, Joi.object({
-        findByEmailOrUsername: Joi.function()
-            .required(),
-        insert: Joi.function()
-            .required()
-    }))
-    const user = await makeUser(userInfo)
+    Joi.assert(userDb.findByEmailOrUsername, Joi.function().required())
+    Joi.assert(userDb.insert, Joi.function().required())
 
-    const exists = await userDb.findByEmailOrUsername(user.getEmail(), user.getUsername())
+    const user = makeUser(userInfo)
+
+    const exists = await userDb.findByEmailOrUsername({ email: user.getEmail(), username: user.getUsername() })
     if (exists) {
         return exists
     }

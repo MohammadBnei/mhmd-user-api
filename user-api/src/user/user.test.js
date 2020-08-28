@@ -8,7 +8,7 @@ const userObj = {
 }
 
 test('Successfully creates an User entity', async (done) => {
-    const user = await makeUser(userObj)
+    const user = makeUser(userObj)
 
     expect(user.getId()).toBe(userObj.id)
     expect(user.getUsername()).toBe(userObj.username)
@@ -20,47 +20,47 @@ test('Successfully creates an User entity', async (done) => {
 
 test('Throw an error on each missing element', async (done) => {
     try {
-        await makeUser({
+        makeUser({
             username: 'test',
             email: 'mohammad@test.com',
             password: 'test'
         })
     } catch (error) {
-        expect(error.message).toBe('"id" is required')
+        expect(error.message).toContain('"id" is required')
     }
     try {
-        await makeUser({
+        makeUser({
             id: '1234',
             email: 'mohammad@test.com',
             password: 'test'
         })
     } catch (error) {
-        expect(error.message).toBe('"username" is required')
+        expect(error.message).toContain('"username" is required')
     }
     try {
-        await makeUser({
+        makeUser({
             id: '1234',
             username: 'test',
             password: 'test'
         })
     } catch (error) {
-        expect(error.message).toBe('"email" is required')
+        expect(error.message).toContain('"email" is required')
     }
     try {
-        await makeUser({
+        makeUser({
             id: '1234',
             username: 'test',
             email: 'mohammad@test.com',
         })
     } catch (error) {
-        expect(error.message).toBe('"password" is required')
+        expect(error.message).toContain('"password" is required')
     }
     done()
 })
 
 test('Throw an error when trying to modify properties directly', async (done) => {
     'use strict'
-    const user = await makeUser(userObj)
+    const user = makeUser(userObj)
 
     try {
         user.id = null

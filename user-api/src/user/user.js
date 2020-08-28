@@ -5,8 +5,8 @@ const Joi = require('joi')
  * returns a functions that creates an user entity
  * @param {Validator} userSchema 
  */
-const buildMakeUser = ({ userSchema, hashPassword, idGenerator }) => async ({
-    id = idGenerator.generate(),
+const buildMakeUser = ({ userSchema, idGenerator }) => ({
+    id,
     username,
     email,
     password,
@@ -17,23 +17,22 @@ const buildMakeUser = ({ userSchema, hashPassword, idGenerator }) => async ({
         modifiedOn = Date.now()
     }
 
-    Joi.assert(userSchema, Joi.object().required())
-    Joi.assert(hashPassword, Joi.function().required())
+    if (!id) {
+        id = idGenerator()
+    }
 
-    const { error, value: user } = userSchema.validate({
+    Joi.assert(userSchema, Joi.object().required())
+
+    const user = {
         id,
         username,
         email,
         password,
         createdOn,
         modifiedOn
-    })
-
-    if (error) {
-        throw new Error(error.message)
     }
 
-    user.password = await hashPassword(user.password)
+    Joi.assert(user, userSchema)
 
     return Object.freeze({
         getUsername: () => user.username,

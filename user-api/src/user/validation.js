@@ -8,9 +8,6 @@ const userSchema = Joi.object({
         .required(),
 
     password: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
         .required(),
 
     id: Joi.string()
@@ -21,8 +18,8 @@ const userSchema = Joi.object({
         .email()
         .required(),
 
-    createdOn: Joi.date(),
-    modifiedOn: Joi.date(),
+    createdOn: Joi.date().timestamp(),
+    modifiedOn: Joi.date().timestamp().required(),
 })
 
 module.exports = userSchema

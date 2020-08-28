@@ -1,120 +1,79 @@
 const makeCrudUser = require('./crud')
-const faker = require('faker')
+const createMockDb = require('./__fixtures')
 
-faker.seed(114477)
 
-const users = []
+let crudUser, users
 
-const userDb = {
-    findByEmailOrUsername: async (email, username) => {
-        return users.find(({ email: _email, username: _username }) => email === _email || username === _username) || null
-    },
-    findAll: async () => users,
-    findById: async id => users.find(({ id: _id }) => _id === id) || null,
-    insert: async (user) => {
-        users.push(user)
-        return user
-    },
-    update: async (user) => {
-        const index = users.findIndex(({ id }) => id === user.id)
+describe('Use-Case - CRUD', () => {
+    beforeAll(async (done) => {
+        const [userDb, usersList] = await createMockDb()
+        users = usersList
+        crudUser = makeCrudUser({ userDb })
 
-        if (!index) {
-            throw new Error('User not found')
-        }
-
-        users.splice(index, 1, user)
-        return user
-    },
-    remove: async (id) => {
-        const index = users.findIndex(({ id: _id }) => _id === id)
-
-        if (!index) {
-            throw new Error('User not found')
-        }
-
-        users.splice(index, 1)
-    }
-}
-
-const {
-    createUser,
-    findAllUser,
-    findUser,
-    updateUser,
-    removeUser,
-} = makeCrudUser({ userDb })
-
-beforeAll(() => {
-    for (let i = 0; i < 100; i++) {
-        const user = {
-            id: faker.random.uuid(),
-            username: faker.name.firstName(10),
-            email: faker.internet.email(),
-            password: faker.random.alphaNumeric(10),
-        }
-
-        users.push(user)
-    }
-})
-
-test('Should return all users', (done) => {
-    findAllUser()
-        .then(list => {
-            expect(list.length).toBe(users.length)
-            done()
-        })
-})
-
-test('Should find a user', (done) => {
-    const initialUser = users[5]
-
-    findUser(initialUser.id)
-        .then(updatedUser => {
-            expect(updatedUser.username).toBe(initialUser.username)
-            expect(updatedUser.email).toBe(initialUser.email)
-            done()
-        })
-})
-
-test('Should create an user', (done) => {
-    const initalUser = {
-        username: faker.name.firstName(10),
-        email: faker.internet.email(),
-        password: faker.random.alphaNumeric(11),
-    }
-
-    createUser(initalUser)
-        .then(user => {
-            expect(user.id).toBeDefined()
-            expect(user.email).toBe(initalUser.email)
-            expect(user.username).toBe(initalUser.username)
-            expect(user.initialUser).not.toBe(initalUser.username)
-            done()
-        })
-})
-
-test('Should update a user', (done) => {
-    const initialUser = users[8]
-
-    updateUser(initialUser.id, {
-        username: 'changeTest',
+        done()
     })
-        .then(updatedUser => {
-            expect(updatedUser.username).toBe('changeTest')
-            expect(updatedUser.email).toBe(initialUser.email)
-            done()
+
+    test('Should return all users', (done) => {
+        crudUser.findAllUser()
+            .then(list => {
+                expect(list.length).toBe(users.length)
+                done()
+            })
+    })
+
+    test('Should find a user', (done) => {
+        const initialUser = users[5]
+
+        crudUser.findUser(initialUser.id)
+            .then(updatedUser => {
+                expect(updatedUser.username).toBe(initialUser.username)
+                expect(updatedUser.email).toBe(initialUser.email)
+                done()
+            })
+    })
+
+    test('Should create an user', (done) => {
+        const initalUser = {
+            username: 'kourosh',
+            email: 'kourosh@test.com',
+            password: 'farvahad19',
+        }
+
+        crudUser.createUser(initalUser)
+            .then(user => {
+                expect(user.id).toBeDefined()
+                expect(user.email).toBe(initalUser.email)
+                expect(user.username).toBe(initalUser.username)
+                expect(user.initialUser).not.toBe(initalUser.username)
+                done()
+            })
+    })
+
+    test('Should update a user', (done) => {
+        const initialUser = { ...users[8] }
+
+        crudUser.updateUser(initialUser.id, {
+            username: 'changeTest',
         })
-})
+            .then(updatedUser => {
+                expect(updatedUser.username).toBe('changeTest')
+                expect(updatedUser.email).toBe(initialUser.email)
+                expect(updatedUser.modifiedOn).toBeGreaterThan(initialUser.modifiedOn)
+                done()
+            })
+    })
 
-test('Should remove a user', async (done) => {
-    const initialUser = users[13]
-    const originalLength = users.length
+    test('Should remove a user', async (done) => {
+        const initialUser = users[13]
+        const originalLength = users.length
 
-    await removeUser(initialUser.id)
+        await crudUser.removeUser(initialUser.id)
 
-    expect(users.length).toBe(originalLength - 1)
+        expect(users.length).toBe(originalLength - 1)
 
-    expect(await findUser(initialUser.id)).toBeNull()
+        expect(await crudUser.findUser(initialUser.id)).toBeNull()
 
-    done()
+        done()
+    })
+
 })

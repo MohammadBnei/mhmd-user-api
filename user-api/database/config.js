@@ -5,7 +5,8 @@ module.exports = {
     },
     'test': {
         'url': process.env.TEST_DATABASE_URL,
-        'dialect': 'postgres'
+        'dialect': 'postgres',
+        'logging': false
     },
     'production': {
         'username': 'root',
