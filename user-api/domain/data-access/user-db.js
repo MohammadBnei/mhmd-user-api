@@ -1,24 +1,22 @@
-const Joi = require('joi')
 const { Op } = require('sequelize')
 
 /**
  * 
  * @param {makdeDb}  
  */
-const makeUserdb = async ({ makeDb }) => {
-    Joi.assert(makeDb, Joi.function().required())
-
-    const { User } = await makeDb()
-
-    function findAllUsers() {
+const makeUserdb = ({ makeDb }) => {
+    async function findAllUser() {
+        const { User } = await makeDb()
         return User.findAll()
     }
 
-    function findById(id) {
+    async function findById(id) {
+        const { User } = await makeDb()
         return User.findByPk(id)
     }
 
-    function findByEmailOrUsername({ email = '', username = '' }) {
+    async function findByEmailOrUsername({ email = '', username = '' }) {
+        const { User } = await makeDb()
         const query = {
             where: {
                 [Op.or]: [
@@ -30,11 +28,13 @@ const makeUserdb = async ({ makeDb }) => {
         return User.findOne(query)
     }
 
-    function insert(user) {
+    async function insert(user) {
+        const { User } = await makeDb()
         return User.create(user)
     }
 
-    function update(id, changes) {
+    async function update(id, changes) {
+        const { User } = await makeDb()
         const query = {
             where: {
                 id
@@ -42,7 +42,8 @@ const makeUserdb = async ({ makeDb }) => {
         }
         return User.update(changes, query)
     }
-    function remove(id) {
+    async function remove(id) {
+        const { User } = await makeDb()
         const query = {
             where: {
                 id
@@ -54,7 +55,7 @@ const makeUserdb = async ({ makeDb }) => {
 
     return Object.freeze({
         findById,
-        findAllUsers,
+        findAllUser,
         findByEmailOrUsername,
         insert,
         update,

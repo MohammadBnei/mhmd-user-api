@@ -1,6 +1,4 @@
 const Joi = require('joi')
-const { compare } = require('bcrypt')
-
 const assert = Joi.assert
 
 const makeTestLogin = ({ userDb }) => async ({
@@ -21,9 +19,13 @@ const makeTestLogin = ({ userDb }) => async ({
         throw new Error('User not found')
     }
 
-    const test = await compare(password, user.password)
+    const test = await user.verifyPassword(password)
 
-    return test && user
+    if (!test) {
+        throw new Error('Wrong password')
+    }
+
+    return user
 }
 
 module.exports = makeTestLogin

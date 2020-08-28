@@ -103,7 +103,7 @@ test('Should NOT find the user by username', async (done) => {
 
 
 test('Should return all users', async (done) => {
-    const dbUsers = await userDb.findAllUsers()
+    const dbUsers = await userDb.findAllUser()
 
     expect(dbUsers.length).toBe(users.length)
     done()
@@ -144,6 +144,32 @@ test('Should update a user', async (done) => {
     const dbUser = await userDb.findById(updatedUser.id)
 
     expect(dbUser.username).toBe('TieUnMonstre')
+
+    done()
+})
+
+test('Should verify a user\'s password', async (done) => {
+    const user = makeUser({
+        username: 'neo',
+        password: 'whereisjhonny',
+        email: 'neo@matrix.com'
+    })
+
+    const newUser = {
+        id: user.getId(),
+        username: user.getUsername(),
+        email: user.getEmail(),
+        modifiedOn: user.getModifiedOn(),
+        createdOn: user.getCreatedOn(),
+        password: user.getPassword()
+    }
+
+    const dbUser = await userDb.insert(newUser)
+
+    const test = await dbUser.verifyPassword('whereisjhonny')
+
+    expect(dbUser.username).toBe('neo')
+    expect(test).toBe(true)
 
     done()
 })

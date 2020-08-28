@@ -9,7 +9,8 @@ const makeRegister = ({ userDb }) => async (userInfo) => {
 
     const exists = await userDb.findByEmailOrUsername({ email: user.getEmail(), username: user.getUsername() })
     if (exists) {
-        return exists
+        const emailOrUsername = exists.username === user.getUsername() ? `Username "${user.getUsername()}"` : `Email "${user.getEmail()}"`
+        throw new Error(`${emailOrUsername} already taken`)
     }
 
     return userDb.insert({

@@ -1,4 +1,4 @@
-const makeUser = require('./')
+const makeUser = require('.')
 
 const userObj = {
     id: '1234',

@@ -12,7 +12,7 @@ module.exports = async () => {
         findByEmailOrUsername: async ({ email, username }) => {
             return users.find(({ email: _email, username: _username }) => email === _email || username === _username) || null
         },
-        findAll: async () => users,
+        findAllUser: async () => users,
         findById: async id => users.find(({ id: _id }) => _id === id) || null,
         insert: async (user) => {
             users.push(user)
@@ -31,7 +31,7 @@ module.exports = async () => {
         remove: async (id) => {
             const index = users.findIndex(({ id: _id }) => _id === id)
 
-            if (!index) {
+            if (index === -1) {
                 throw new Error('User not found')
             }
 
@@ -45,6 +45,7 @@ module.exports = async () => {
             email: faker.internet.email(),
             password: faker.random.alphaNumeric(10),
         })
+        const hashPassword = await bcrypt.hash(user.getPassword(), 10)
 
         users.push({
             id: user.getId(),
@@ -52,8 +53,9 @@ module.exports = async () => {
             email: user.getEmail(),
             modifiedOn: user.getModifiedOn(),
             createdOn: user.getCreatedOn(),
-            password: await bcrypt.hash(user.getPassword(), 10),
-            clearPassword: user.getPassword()
+            password: hashPassword,
+            clearPassword: user.getPassword(),
+            verifyPassword: (passwordTest) => bcrypt.compare(passwordTest, hashPassword)
         })
     }
     return [userDb, users]

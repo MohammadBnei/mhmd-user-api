@@ -36,27 +36,20 @@ test('Should find the user by email, compare password and return the user', (don
         })
 })
 
-test('Should find the user by username, fail at comparing passwords', (done) => {
+test('Should find the user by username, fail at comparing passwords', async () => {
     const initialUser = users[2]
-    testLogin({
+
+    await expect(testLogin({
         username: initialUser.username,
         password: 'fail'
-    })
-        .then(user => {
-            expect(user).toBe(false)
-            done()
-        })
+    })).rejects.toThrow('Wrong password')
 })
 
-test('Should not find the user', (done) => {
-    testLogin({
+test('Should not find the user', async () => {
+    await expect(testLogin({
         username: 'failing',
         password: 'fail'
-    })
-        .catch(error => {
-            expect(error.message).toBe('User not found')
-            done()
-        })
+    })).rejects.toThrow('User not found')
 })
 
 
